@@ -9,7 +9,6 @@ int n,k;
 int dp[SIZE]; // how many consecutive concurrent brackets eding at i
 int tree[10][2*MAX];
 string tab[10];
-map<vector<int>,int> mapa;
 
 int query(int ind, int x, int y){
 	int res = 1e9;
@@ -25,10 +24,11 @@ int wezsobie(int x){
 	return dp[x];
 }
 
-int getit(vector<int>& x){
-	auto it = mapa.find(x);
-	if(it == mapa.end()) return -1;
-	return (*it).second;
+bool cor(int ind, int x, int y){
+	if(tab[ind][x] != '(') return false;
+	if(query(ind,x,y + 1) - tree[ind][x + MAX] + 1 < 0) return false;
+	if(tree[ind][y + MAX] + 1 != tree[ind][x + MAX]) return false;
+	return true;
 }
 
 int main() {
@@ -42,58 +42,57 @@ int main() {
 	for(int i = 0; i < k; i++)
 		fin >> tab[i];
 		
+	vector<stack<int> > stacks(k);
+	
 	long long res = 0;
 	
 	for(int i = 0; i < k; i++){
-		
 		if(tab[i][0] == '(') tree[i][MAX] = 1;
 		else tree[i][MAX] = -1;
-		
 		for(int j = 1; j < n; j++){
-			tree[i][j + MAX] = max(tree[i][j + MAX - 1],0);
+			tree[i][j + MAX] = tree[i][j + MAX - 1];
 			if(tab[i][j] == '(') tree[i][j + MAX]++;
 			else tree[i][j + MAX]--;	
 		}
-		
-		for(int j = 0; j < n; j++){
-			if(tree[i][j + MAX] < 0) tree[i][j + MAX] = -1e9;
-		}
-		
 		for(int j = MAX - 1; j > 0; j--)
 			tree[i][j] = min(tree[i][2*j],tree[i][2*j+1]);
-	
 	}
 	
 	for(int i = 0; i < n; i++){
-		bool allending = true;
-		bool allbegin = true;
-		bool allok = true;
-		vector<int> tmp(k);
-		for(int j = 0; j < k; j++){
-			if(tab[j][i] == '(') allending = false;
-			else allbegin = false;
-			tmp[j] = tree[j][i + MAX];
-		}
-		for(auto it : tmp) if(it == -1e9) allok = false;
 		
-		if(allbegin){
-			mapa[tmp] = i;
-		} else if(allok){
-			for(int j = 0; j < k; j++)
-				tmp[j]++;
-			int index = getit(tmp);
-			if(index != -1){
-				//cout << i << " " << index << " ";
-				for(int j = 0; j < k; j++)
-					if(query(j,index,i) < tree[j][i+MAX]) allok = false;
-				if(allok){
-					dp[i] = wezsobie(index-1) + 1;
-					res += dp[i]; 
-					//cout << dp[i];
+		bool allending = true;
+		bool allcorrect = true;
+		int index = 1e9;
+		
+		for(int j = 0; j < k; j++){
+			if(tab[j][i] == '('){
+				allending = false;
+				stacks[j].push(i);
+			} else {
+				if(stacks[j].empty()) allcorrect = false;
+			 	else {
+					index = min(index,stacks[j].top());
+					stacks[j].pop();			
 				}
-				//cout << endl;
 			}
+			
 		}
+		
+		if(allending && allcorrect){
+
+			bool spokoloko = true;
+		
+			for(int j = 0; j < k; j++)
+				if(!cor(j,index,i)){
+					spokoloko = false;
+					
+			if(spokoloko){
+				dp[i] = wezsobie(index-1) + 1;
+				res += dp[i];		
+			}
+			
+		}
+		
 	}	
 	
 	fout << res;	
