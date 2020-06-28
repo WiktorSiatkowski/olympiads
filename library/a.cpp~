@@ -1,0 +1,66 @@
+#include <bits/stdc++.h>
+using namespace std;
+#define imie(...) " [" << #__VA_ARGS__ ": " << (__VA_ARGS__) << "] "
+#define ll long long
+#define ST first
+#define ND second
+     
+const int INF = (int)1e9; const long long INFL = (long long)1e18;
+     
+void test_case(){
+    	int n; cin >> n;
+    	int xLowerthan = INF;
+    	int yLowerthan = INF;
+    	int xBiggerthan = -INF;
+    	int yBiggerthan = -INF;
+		vector<pair<int,int> > pa;
+    	for(int i = 0; i < n; i++){
+    		int x,y,a1,b2,c3,d4; cin >> x >> y >> a1 >> b2 >> c3 >> d4;	
+			pa.push_back({x,y});
+    		if(!a1){
+    			if(xLowerthan < x) {
+    				cout << 0 << "\n";
+    				return;
+    			}
+    			xBiggerthan = x;
+    		}
+    		if(!b2){
+    			if(yBiggerthan > y){
+    				cout << 0 << "\n";
+    				return;
+    			}
+    			yLowerthan = y;
+    		}	
+    		if(!c3){
+    			if(xBiggerthan > x){
+    				cout << 0 << "\n";
+    				return;
+    			} 
+    			xLowerthan = x;
+    		}
+    		if(!d4){
+    			if(yLowerthan < y){
+    				cout << 0 << "\n";
+    				return;
+    			}
+    			yBiggerthan = y;
+    		}
+    	}
+    	for(auto it : pa){
+		if(it.first >= xBiggerthan && it.first <= xLowerthan && it.second >= yBiggerthan && it.second <= yLowerthan){
+			cout << 1 << " " << it.first << " " << it.second << "\n";
+			return;
+		}
+	}
+	
+	assert(true);
+     
+}
+     
+    int main() {  
+    	//ios::sync_with_stdio(false); cin.tie(0); cout.tie(0);	
+    	int q; cin >> q;	
+    	while(q--){
+    		test_case();
+    	}
+    }
