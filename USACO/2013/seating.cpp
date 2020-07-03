@@ -86,9 +86,10 @@ void update(int u, int lo, int hi){
 	}
 }
 
-int query(int u, int przlen, int len){
+int query(int u, int przlen, int len, int lo, int hi){
+	//cout << u << endl;
 	if(u >= MAX){
-		return wyn[u].ST;
+		return u - MAX;
 	}
 	if(state[u] == 1){
 		state[u] = 0;
@@ -97,13 +98,16 @@ int query(int u, int przlen, int len){
 	}
 	if(wyn[u].ND >= len){
 		if(wyn[2*u].ND >= len){
-			return query(2*u,przlen/2,len);
+			int tmp = query(2*u,przlen/2,len,lo,(lo+hi)/2);
+			update(u,lo,hi);
+			return tmp;
 		} else {
 			return wyn[u].ST;
 		}
 	} else {
 		return -1;
 	}
+	
 }
 
 void blockit(int a, int b, int u, int lo, int hi){
@@ -141,7 +145,7 @@ void unblockit(int a, int b, int u, int lo, int hi){
 }
 
 int main() {
-	cin.tie(0); cout.tie(0); ios::sync_with_stdio(false);
+	//cin.tie(0); cout.tie(0); ios::sync_with_stdio(false);
 	    
 	ofstream fout ("seating.out");
 	ifstream fin ("seating.in");
@@ -150,18 +154,18 @@ int main() {
 
 	build();
 	
-	fin >> n >> m;
+	cin >> n >> m;
     
     while(m--){
-    	char c; fin >> c;
+    	char c; cin >> c;
     	if(c == 'A'){
-    		int x; fin >> x;
-    		int qr = query(1,MAX,x);
+    		int x; cin >> x;
+    		int qr = query(1,MAX,x,0,MAX);
     		if(qr == -1 || qr + x - 1 >= n) res++;
     		else blockit(qr,qr + x,1,0,MAX);
     		//cout << qr << endl;
     	} else {
-    		int x,y; fin >> x >> y;
+    		int x,y; cin >> x >> y;
     		x--;
     		unblockit(x,y,1,0,MAX);
     	}
@@ -171,7 +175,7 @@ int main() {
 		cout << i << "  :  " << state[i] << " " << maxpref[i] << " " << maxsuf[i] << " " << wyn[i].ST << " " << wyn[i].ND << endl;
 	}*/
 
-	fout << res << "\n";
+	cout << res << "\n";
 	
 	return 0;
 }
